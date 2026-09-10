@@ -27,6 +27,8 @@ export default function CarScene({ mode, finish = 'black', angle = 'auto' }: { m
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = mode === 'hero' ? .9 : 1.05;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.domElement.setAttribute('aria-hidden', 'true');
     el.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
@@ -36,13 +38,19 @@ export default function CarScene({ mode, finish = 'black', angle = 'auto' }: { m
     const environment = pmrem.fromScene(room, 0.045);
     scene.environment = environment.texture;
     room.dispose(); pmrem.dispose();
-    const light = new THREE.DirectionalLight('#ffffff', 3.4);
+    const light = new THREE.DirectionalLight('#fff5e8', 2.4);
     light.position.set(2, 6, -4); scene.add(light);
-    const rim = new THREE.DirectionalLight(mode === 'hero' ? '#c5d9f0' : '#dbe6f2', 4.2);
+    light.castShadow = true;
+    light.shadow.mapSize.set(2048,2048);
+    Object.assign(light.shadow.camera,{left:-4,right:4,top:4,bottom:-4,near:.1,far:18});
+    light.shadow.normalBias = .025;
+    light.shadow.bias = -.0002;
+    const rim = new THREE.DirectionalLight('#e9edf2', 1.3);
     rim.position.set(-4, 3, 2); scene.add(rim);
-    const body = new THREE.MeshPhysicalMaterial({ color: finishes[finish].color, metalness: 0.65, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.09 });
+    const body = new THREE.MeshPhysicalMaterial({ color: finishes[finish].color, metalness: 0.25, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.18 });
+    const paintMaterials:THREE.MeshPhysicalMaterial[]=[];
     const details = new THREE.MeshStandardMaterial({ color: '#606570', metalness: 1, roughness: 0.24 });
-    const glass = new THREE.MeshPhysicalMaterial({ color: '#242933', metalness: 0.2, roughness: 0.12, transparent: true, opacity: 0.87 });
+    const glass = new THREE.MeshPhysicalMaterial({ color: '#101819', metalness: 0, roughness: 0.08, clearcoat:1, envMapIntensity:.7 });
     const draco = new DRACOLoader(); draco.setDecoderPath('/draco/');
     const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
     let model: THREE.Object3D | undefined;
@@ -54,9 +62,18 @@ export default function CarScene({ mode, finish = 'black', angle = 'auto' }: { m
       model.traverse(o => {
         if (o instanceof THREE.Mesh) {
           const original = Array.isArray(o.material) ? o.material[0] : o.material;
-          if (/^aiStandardSurface(1|2|3|4|21|33|43|44)SG$/.test(original.name)) o.material = body;
+          o.castShadow = true;
+          o.receiveShadow = true;
+          if (/^aiStandardSurface(1|2|3|4|21|33|43|44)SG$/.test(original.name)) {
+            const paint=body.clone();
+            if(original instanceof THREE.MeshStandardMaterial){paint.normalMap=original.normalMap;paint.normalScale.set(.3,.3);}
+            paintMaterials.push(paint);o.material=paint;
+          }
           if (/^aiStandardSurface(39|41)SG$/.test(original.name)) o.material = glass;
-          if (original instanceof THREE.MeshStandardMaterial) original.emissiveIntensity = Math.min(original.emissiveIntensity, 1.5);
+          if (original instanceof THREE.MeshStandardMaterial) {
+            original.emissiveIntensity = .02;
+            if(/^aiStandardSurface(15|17|19|22|29|31|35)SG$/.test(original.name)){original.metalness=0;original.roughness=.9;original.envMapIntensity=.25;}
+          }
         }
       });
       const bounds = new THREE.Box3().setFromObject(model);
@@ -66,6 +83,8 @@ export default function CarScene({ mode, finish = 'black', angle = 'auto' }: { m
       const center = bounds.getCenter(new THREE.Vector3());
       model.position.add(new THREE.Vector3(-center.x,-bounds.min.y,-center.z));
       scene.add(model);
+      const floor=new THREE.Mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.45}));
+      floor.rotation.x=-Math.PI/2;floor.position.y=-.003;floor.receiveShadow=true;scene.add(floor);
       const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.4,5.5), new THREE.ShaderMaterial({vertexShader:'varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv; void main(){vec2 p=(vUv-.5)*2.;float a=exp(-dot(p,p)*4.)*.42;gl_FragColor=vec4(0.,0.,0.,a);}',transparent:true,depthWrite:false}));
       shadow.rotation.x=-Math.PI/2;shadow.position.y=.005;scene.add(shadow);
       ready = true;
@@ -94,10 +113,11 @@ export default function CarScene({ mode, finish = 'black', angle = 'auto' }: { m
       if (mode === 'studio' && latest.current.angle !== 'auto') desired = ({ front: .14, side: 1.56, rear: 2.7 } as Record<string, number>)[latest.current.angle] ?? .7;
       orbit = reduced.matches ? desired : THREE.MathUtils.lerp(orbit, desired + pointerX, .075);
       const radius = mobile ? (mode === 'hero' ? 6.3 : 6.5) : (mode === 'hero' ? 6.7 : 6.4);
-      const height = mode === 'hero' ? 2.7 + p * .6 : 2.5 + p * .45;
+      const height = mode === 'hero' ? 1.8 + p * .35 : 1.7 + p * .3;
       camera.position.set(Math.sin(orbit) * radius, height + pointerY, -Math.cos(orbit) * radius);
       target.set(0, mode === 'hero' ? .95 : 1.0, 0); camera.lookAt(target);
       body.color.lerp(new THREE.Color(finishes[latest.current.finish].color), reduced.matches ? 1 : .12);
+      paintMaterials.forEach(paint=>paint.color.copy(body.color));
       const signature = `${orbit.toFixed(3)}:${height.toFixed(3)}:${body.color.getHexString()}:${camera.aspect.toFixed(3)}:${pointerY.toFixed(3)}`;
       if (signature === previousFrame && rendered) return;
       previousFrame = signature;

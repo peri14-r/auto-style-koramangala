@@ -40,9 +40,9 @@ export default function Home(){
   <div className="hero-intro"><p>CAR ACCESSORIES & CUSTOMISATION</p><p>KORAMANGALA, BENGALURU <span className="mini-cross">+</span></p></div>
   <h1 className="hero-word" data-sc-parallax="-0.1">AUTO STYLE</h1>
   <div className="hero-orbit" aria-hidden="true"/>
-  <CarScene mode="hero"/>
+  <div className="hero-scene hero-photograph ready" data-sc-parallax="0.055"><img src="/images/thar-photoreal.webp" alt="Photorealistic concept image of a black Mahindra Thar" width="1536" height="1024" fetchPriority="high"/></div>
   <div className="hero-side"><span>FORM.</span><span>FEEL.</span><span>PERSONALITY.</span></div>
-  <div className="hero-base"><div><h2>Anything but<br/><em>ordinary.</em></h2><p>For the love of your drive.</p></div><a className="circle-link" href="#studio"><span>EXPLORE<br/>YOUR STYLE</span><ArrowUpRight size={28}/></a><p className="hero-note">Your everyday car.<br/>Your own point of view.<br/><span>Illustrative 3D showcase</span></p></div>
+  <div className="hero-base"><div><h2>Anything but<br/><em>ordinary.</em></h2><p>For the love of your drive.</p></div><a className="circle-link" href="#studio"><span>EXPLORE<br/>YOUR STYLE</span><ArrowUpRight size={28}/></a><p className="hero-note">Your everyday car.<br/>Your own point of view.<br/><span>Photorealistic concept image</span></p></div>
  </section>
  <section className="manifesto" data-sc-act="flow"><div className="manifesto-top"><span>A DIFFERENT KIND OF DRIVE</span><Plus size={24}/></div><p className="manifesto-copy reveal"><span className="sentence"><span>Some cars get you there.</span></span><span className="sentence"><span><em>Yours should feel</em> like you.</span></span></p><div className="manifesto-bottom"><span className="red-dash"/><p>The sound. The finish. The small details you notice every day.<br/>Explore a more personal drive with Auto Style Koramangala.</p></div></section>
  <section className="studio" id="studio" data-sc-act="pin" data-sc-span="2.4">
