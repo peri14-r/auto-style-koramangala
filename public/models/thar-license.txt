@@ -1,0 +1,8 @@
+THAR 4X4 by MB_Mahesh
+Source: https://sketchfab.com/3d-models/thar-4x4-66ee970b18014c98a1750064b65657b0
+Creator: https://sketchfab.com/MB_Mahesh
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+
+Adaptations: textures resized and compressed for web delivery; body material changed to selectable black, silver, and red; glass, lighting, orientation, and scene presentation adapted.
+Illustrative showroom vehicle. No affiliation with or endorsement by Mahindra.

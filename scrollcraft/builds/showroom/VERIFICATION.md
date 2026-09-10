@@ -30,3 +30,6 @@ Recognition -> curiosity -> agency -> material detail -> resolve. The 3D studio 
 
 ## Limits
 Browser emulation and headless Chrome; not a physical iPhone/Android test. No real client project imagery or independent verification of service inventory/contact number. No end-to-end WhatsApp send or business contact performed. No price or sales outcome promised.
+
+## Black Thar revision
+User-supplied thar_4x4.glb from the selected MB_Mahesh Sketchfab model. Embedded metadata confirms CC BY 4.0; creator and adaptations credited. Texture optimization reduced 65,256,020 bytes to 14,118,396 bytes without changing geometry. Black is the default; model oriented to show its front, windows tinted, camera height and target adapted to SUV dimensions. Four fallback posters refreshed. Desktop/mobile visual review, TypeScript, production build, and full enquiry, reduced-motion and WebGL fallback checks passed.

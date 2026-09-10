@@ -8,7 +8,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 import { finishes, type Finish } from '@/lib/automotive';
 
-export default function CarScene({ mode, finish = 'silver', angle = 'auto' }: { mode: 'hero' | 'studio'; finish?: Finish; angle?: string }) {
+export default function CarScene({ mode, finish = 'black', angle = 'auto' }: { mode: 'hero' | 'studio'; finish?: Finish; angle?: string }) {
   const host = useRef<HTMLDivElement>(null);
   const latest = useRef({ finish, angle });
   latest.current = { finish, angle };
@@ -38,33 +38,36 @@ export default function CarScene({ mode, finish = 'silver', angle = 'auto' }: { 
     room.dispose(); pmrem.dispose();
     const light = new THREE.DirectionalLight('#ffffff', 3.4);
     light.position.set(2, 6, -4); scene.add(light);
-    const rim = new THREE.DirectionalLight(mode === 'hero' ? '#b9d1ed' : '#f4a28a', 2.5);
+    const rim = new THREE.DirectionalLight(mode === 'hero' ? '#c5d9f0' : '#dbe6f2', 4.2);
     rim.position.set(-4, 3, 2); scene.add(rim);
-    const body = new THREE.MeshPhysicalMaterial({ color: finishes[finish].color, metalness: 0.78, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.13 });
+    const body = new THREE.MeshPhysicalMaterial({ color: finishes[finish].color, metalness: 0.65, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.09 });
     const details = new THREE.MeshStandardMaterial({ color: '#606570', metalness: 1, roughness: 0.24 });
     const glass = new THREE.MeshPhysicalMaterial({ color: '#242933', metalness: 0.2, roughness: 0.12, transparent: true, opacity: 0.87 });
     const draco = new DRACOLoader(); draco.setDecoderPath('/draco/');
     const loader = new GLTFLoader(); loader.setDRACOLoader(draco);
     let model: THREE.Object3D | undefined;
     const disposeObject = (object: THREE.Object3D) => object.traverse(o => { if (o instanceof THREE.Mesh) { o.geometry.dispose(); const materials = Array.isArray(o.material) ? o.material : [o.material]; materials.forEach(m => m.dispose()); } });
-    loader.load('/models/ferrari.glb', gltf => {
+    loader.load('/models/thar.glb', gltf => {
       if (disposed) { disposeObject(gltf.scene); return; }
-      model = gltf.scene.children[0];
+      model = gltf.scene;
+      model.rotation.y = Math.PI;
       model.traverse(o => {
         if (o instanceof THREE.Mesh) {
           const original = Array.isArray(o.material) ? o.material[0] : o.material;
-          if (/Leather|Interior|Carpet/.test(original.name)) o.material = new THREE.MeshStandardMaterial({color:'#15161a',roughness:.8});
-          if (original.name === 'Tires') o.material = new THREE.MeshStandardMaterial({color:'#101114',roughness:.94});
-          if (o.name === 'body') o.material = body;
-          else if (['rim_fl','rim_fr','rim_rr','rim_rl','trim'].includes(o.name)) o.material = details;
-          else if (o.name === 'glass') o.material = glass;
+          if (/^aiStandardSurface(1|2|3|4|21|33|43|44)SG$/.test(original.name)) o.material = body;
+          if (/^aiStandardSurface(39|41)SG$/.test(original.name)) o.material = glass;
+          if (original instanceof THREE.MeshStandardMaterial) original.emissiveIntensity = Math.min(original.emissiveIntensity, 1.5);
         }
       });
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3());
+      model.scale.multiplyScalar(4.1 / Math.max(size.x,size.z));
+      bounds.setFromObject(model);
+      const center = bounds.getCenter(new THREE.Vector3());
+      model.position.add(new THREE.Vector3(-center.x,-bounds.min.y,-center.z));
       scene.add(model);
-      const shadowTex = new THREE.TextureLoader().load('/models/ferrari_ao.png');
-      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(0.655 * 4, 1.3 * 4), new THREE.ShaderMaterial({ uniforms:{shadowMap:{value:shadowTex}}, vertexShader:'varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'uniform sampler2D shadowMap; varying vec2 vUv; void main(){float a=(1.-texture2D(shadowMap,vUv).r)*0.48;gl_FragColor=vec4(0.,0.,0.,a);}', transparent:true,depthWrite:false }));
-      shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.01; shadow.renderOrder = 2;
-      model.add(shadow);
+      const shadow = new THREE.Mesh(new THREE.PlaneGeometry(3.4,5.5), new THREE.ShaderMaterial({vertexShader:'varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv; void main(){vec2 p=(vUv-.5)*2.;float a=exp(-dot(p,p)*4.)*.42;gl_FragColor=vec4(0.,0.,0.,a);}',transparent:true,depthWrite:false}));
+      shadow.rotation.x=-Math.PI/2;shadow.position.y=.005;scene.add(shadow);
       ready = true;
     }, undefined, () => { if (!disposed) setStatus('fallback'); });
     let pointerX = 0, pointerY = 0, orbit = 0.8;
@@ -91,9 +94,9 @@ export default function CarScene({ mode, finish = 'silver', angle = 'auto' }: { 
       if (mode === 'studio' && latest.current.angle !== 'auto') desired = ({ front: .14, side: 1.56, rear: 2.7 } as Record<string, number>)[latest.current.angle] ?? .7;
       orbit = reduced.matches ? desired : THREE.MathUtils.lerp(orbit, desired + pointerX, .075);
       const radius = mobile ? (mode === 'hero' ? 6.3 : 6.5) : (mode === 'hero' ? 6.7 : 6.4);
-      const height = mode === 'hero' ? 1.9 + p * .6 : 1.65 + p * .45;
+      const height = mode === 'hero' ? 2.7 + p * .6 : 2.5 + p * .45;
       camera.position.set(Math.sin(orbit) * radius, height + pointerY, -Math.cos(orbit) * radius);
-      target.set(0, mode === 'hero' ? .55 : .6, 0); camera.lookAt(target);
+      target.set(0, mode === 'hero' ? .95 : 1.0, 0); camera.lookAt(target);
       body.color.lerp(new THREE.Color(finishes[latest.current.finish].color), reduced.matches ? 1 : .12);
       const signature = `${orbit.toFixed(3)}:${height.toFixed(3)}:${body.color.getHexString()}:${camera.aspect.toFixed(3)}:${pointerY.toFixed(3)}`;
       if (signature === previousFrame && rendered) return;
@@ -111,7 +114,7 @@ export default function CarScene({ mode, finish = 'silver', angle = 'auto' }: { 
     renderer.domElement.addEventListener('webglcontextlost', contextLost);
     return () => { disposed = true; cancelAnimationFrame(frame); observer.disconnect(); intersection.disconnect(); el.removeEventListener('pointermove', pointer); el.removeEventListener('pointerleave', leave); el.removeEventListener('scene:capture',capture); renderer.domElement.removeEventListener('webglcontextlost', contextLost); scene.traverse(o => { if (o instanceof THREE.Mesh) { const mats = Array.isArray(o.material) ? o.material : [o.material]; mats.forEach(m => { const map = (m as THREE.MeshBasicMaterial).map; map?.dispose(); }); } }); if (model) disposeObject(model); body.dispose(); details.dispose(); glass.dispose(); environment.dispose(); draco.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, [mode]);
-  return <div className={`car-scene ${mode}-scene ${status}`} ref={host} data-testid={`${mode}-scene`} role="img" aria-label={`Illustrative sports car in ${finishes[finish].label}. ${mode === 'studio' ? 'Choose a finish and view using the controls.' : 'A sculptural automotive studio scene.'}`}>
+  return <div className={`car-scene ${mode}-scene ${status}`} ref={host} data-testid={`${mode}-scene`} role="img" aria-label={`Illustrative Mahindra Thar 4×4 in ${finishes[finish].label}. ${mode === 'studio' ? 'Choose a finish and view using the controls.' : 'A sculptural automotive studio scene.'}`}>
     <picture className="scene-poster"><source media="(max-width:700px)" srcSet={`/images/${mode}-mobile.webp`}/><img src={`/images/${mode}-desktop.webp`} alt="" width="1440" height="760"/></picture>
     {status === 'loading' && <span className="scene-loading">Preparing the showroom</span>}
     {status === 'fallback' && <span className="scene-fallback">Studio preview. Explore your options below.</span>}

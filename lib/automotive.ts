@@ -1,2 +1,2 @@
-export type Finish = 'silver' | 'red' | 'graphite';
-export const finishes = { silver: { label: 'Liquid silver', color: '#9da5af' }, red: { label: 'Rosso red', color: '#b91d14' }, graphite: { label: 'Graphite', color: '#282c33' } };
+export type Finish = 'black' | 'silver' | 'red';
+export const finishes = { black: { label: 'Midnight black', color: '#08090b' }, silver: { label: 'Liquid silver', color: '#9da5af' }, red: { label: 'Deep red', color: '#b91d14' } };

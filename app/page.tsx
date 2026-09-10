@@ -16,7 +16,7 @@ function CarScene(props:SceneProps){
 const services=['Exterior styling','Lighting upgrades','Audio & infotainment','Interior accessories'];
 const maps='https://maps.app.goo.gl/vfyh5b5weHkkD34L6';
 export default function Home(){
- const [finish,setFinish]=useState<Finish>('silver');
+ const [finish,setFinish]=useState<Finish>('black');
  const [angle,setAngle]=useState('auto');
  const [service,setService]=useState('Exterior styling');
  const [vehicle,setVehicle]=useState('');
@@ -72,7 +72,7 @@ export default function Home(){
   <div className="chosen-finish"><span><i style={{background:finishes[finish].color}}/> {finishes[finish].label}</span><a href="#studio">Change inspiration</a></div>
   <button className="submit" type="submit">PLAN MY UPGRADE <MessageCircle size={21}/></button><p className="form-note" role="status">{opened?'Your WhatsApp draft is ready. Review it and tap Send in WhatsApp.':'Opens a WhatsApp draft. Nothing is sent automatically.'}</p>{opened&&<a className="retry-whatsapp" href={whatsapp} target="_blank" rel="noopener noreferrer">Open WhatsApp draft again <ArrowUpRight size={14}/></a>}
  </form></section>
- <footer id="visit"><div className="footer-top"><a className="footer-logo" href="#top">AUTO STYLE<span>MADE PERSONAL.</span></a><div><p>COME BY. SAY HELLO.</p><a href={maps} target="_blank" rel="noopener noreferrer"><MapPin size={17}/>Koramangala, Bengaluru <ArrowUpRight size={17}/></a><a href="tel:+919845004858"><Phone size={17}/>+91 98450 04858</a><span className="hours-note">Confirm store hours before visiting.</span></div><a className="footer-contact" href={whatsapp} target="_blank" rel="noopener noreferrer">LET’S TALK <ArrowUpRight size={28}/></a></div><div className="footer-bottom"><span>CONCEPT BY PEKIFLOW</span><p>Illustrative vehicles and photography. Services and contact details await owner confirmation.<br/>3D model: <a href="https://threejs.org/examples/webgl_materials_car.html" target="_blank" rel="noopener noreferrer">Ferrari 458 Italia by vicent091036 / Three.js example</a>. No brand affiliation.</p><span>BENGALURU, INDIA</span></div></footer>
+ <footer id="visit"><div className="footer-top"><a className="footer-logo" href="#top">AUTO STYLE<span>MADE PERSONAL.</span></a><div><p>COME BY. SAY HELLO.</p><a href={maps} target="_blank" rel="noopener noreferrer"><MapPin size={17}/>Koramangala, Bengaluru <ArrowUpRight size={17}/></a><a href="tel:+919845004858"><Phone size={17}/>+91 98450 04858</a><span className="hours-note">Confirm store hours before visiting.</span></div><a className="footer-contact" href={whatsapp} target="_blank" rel="noopener noreferrer">LET’S TALK <ArrowUpRight size={28}/></a></div><div className="footer-bottom"><span>CONCEPT BY PEKIFLOW</span><p>Illustrative vehicles and photography. Services and contact details await owner confirmation.<br/>3D model: <a href="https://sketchfab.com/3d-models/thar-4x4-66ee970b18014c98a1750064b65657b0" target="_blank" rel="noopener noreferrer">THAR 4X4 by MB_Mahesh (CC BY 4.0; finish and presentation adapted)</a>. No brand affiliation.</p><span>BENGALURU, INDIA</span></div></footer>
  <a href="#enquiry" className="mobile-plan">PLAN MY UPGRADE <ArrowUpRight size={20}/></a>
  </main>;
 }
