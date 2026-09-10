@@ -46,7 +46,8 @@ export default function CarScene({
     const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const fine = matchMedia('(pointer: fine)');
 
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    // Keep the first render light on high-DPI screens; the poster remains visible while the model loads.
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = mode === 'hero' ? 1.25 : 1.35;
@@ -72,7 +73,7 @@ export default function CarScene({
     const overheadSoftbox = new THREE.DirectionalLight('#ffffff', 3.6);
     overheadSoftbox.position.set(0, 9, 1);
     overheadSoftbox.castShadow = true;
-    overheadSoftbox.shadow.mapSize.set(2048, 2048);
+    overheadSoftbox.shadow.mapSize.set(1024, 1024);
     Object.assign(overheadSoftbox.shadow.camera, {
       left: -4.5,
       right: 4.5,
@@ -139,7 +140,11 @@ export default function CarScene({
       });
     };
 
-    loader.load(
+    let loadStarted = false;
+    const loadModel = () => {
+      if (loadStarted || disposed) return;
+      loadStarted = true;
+      loader.load(
       '/models/thar.glb',
       (gltf) => {
         if (disposed) {
@@ -242,7 +247,8 @@ export default function CarScene({
       () => {
         if (!disposed) setStatus('fallback');
       }
-    );
+      );
+    };
 
     let pointerX = 0,
       pointerY = 0;
@@ -320,8 +326,15 @@ export default function CarScene({
     const intersection = new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
+        if (!entry.isIntersecting || loadStarted) return;
+        const start = () => loadModel();
+        if ('requestIdleCallback' in window) {
+          window.requestIdleCallback(start, { timeout: mode === 'hero' ? 1200 : 2400 });
+        } else {
+          setTimeout(start, mode === 'hero' ? 250 : 600);
+        }
       },
-      { rootMargin: '100px' }
+      { rootMargin: mode === 'hero' ? '0px' : '240px' }
     );
     intersection.observe(el);
 
