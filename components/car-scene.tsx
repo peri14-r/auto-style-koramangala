@@ -26,9 +26,14 @@ export default function CarScene({
     const current = host.current;
     if (!current) return;
     const el: HTMLDivElement = current;
+    const mobileDevice = matchMedia('(max-width: 700px)').matches;
+    // Phones keep the optimized poster and avoid downloading the heavy GLB model.
+    if (mobileDevice) {
+      setStatus('mobile');
+      return;
+    }
     let renderer: THREE.WebGLRenderer;
     try {
-      const mobileDevice = matchMedia('(max-width: 700px)').matches;
       renderer = new THREE.WebGLRenderer({
         antialias: !mobileDevice,
         alpha: true,
