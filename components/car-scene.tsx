@@ -470,7 +470,7 @@ export default function CarScene({
           height="760"
         />
       </picture>
-      {status === 'loading' && (
+      {status === 'loading' && mode === 'studio' && (
         <span className="scene-loading">Preparing 3D showroom...</span>
       )}
       {status === 'fallback' && (
@@ -479,3 +479,4 @@ export default function CarScene({
     </div>
   );
 }
+
