@@ -7,11 +7,11 @@ Private sales homepage for Auto Style Koramangala, prepared by PEKIFLOW. Intende
 - Supplied Maps link: https://maps.app.goo.gl/vfyh5b5weHkkD34L6
 - Phone from the chat: +91 98450 04858. Web search did not independently establish a current association with Auto Style, so the concept explicitly calls for owner confirmation.
 - Categories are proposed demo content. Confirm actual inventory, installation services, business address and phone before final launch.
-- The original AI-generated SUV image is illustrative, not a store project. Do not represent it as completed customer work.
+- The 3D showroom and generated wheel/interior photographs are illustrative, not store projects. The model is attributed in the footer; verify commercial asset rights before client handover.
 - No invented ratings, reviews, warranties, years of experience, product prices, brand partnerships or before-and-after results.
 
 ## Customer journey
-Visitors browse upgrade categories, open a WhatsApp draft with the selected category and their vehicle details, or use the phone and Maps links. Opening a link does not send a message automatically.
+Visitors explore a scroll-driven 3D showroom, choose silver/red/graphite finish inspiration and camera angles, browse photographic upgrade sections, then open a WhatsApp draft carrying their vehicle, service, finish and notes. Phone and Maps links are available. Opening a draft does not send a message automatically. Mobile, reduced-motion and WebGL fallback layouts are included.
 
 ## Before client delivery
 Use owner-approved actual project photos to add a project gallery. Confirm contact details and exact offer scope. Hosting is owner-private by default; grant intended audience access before sending a demo link to the business.
